@@ -5,7 +5,7 @@ console.log('====================================');
 var express = require('express');
 var request = require('request');
 var fs = require("fs")
-var app = express();
+var app = require('./app');
 app.get('/channels.json', function (req, res) {
     var baseUrl = 'http://ivi.bupt.edu.cn'
     var channelsJson;
