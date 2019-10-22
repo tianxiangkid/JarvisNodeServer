@@ -4,8 +4,54 @@ console.log('====================================')
 
 var request = require('request')
 var fs = require("fs")
-var express = require('express');
-var router = express.Router();
+var express = require('express')
+var router = express.Router()
+const multer = require('multer')
+const multerService = multer({
+    storage: multer.diskStorage({
+        destination: function (req, file, cb) {
+            cb(null, './public/files')
+        },
+        filename: function (req, file, cb) {
+            //file.originalname上传文件的原始文件名
+            // var changedName = (new Date().getTime()) + '-' + file.originalname
+            // cb(null, changedName)
+            cb(null, file.originalname)
+        },
+    }),
+})
+router.use(multerService.any())
+let singleUpload = multerService.single('singleFile')
+router.post('/upload', (req, res) => {
+    console.log(req.files)
+    singleUpload(req, res, (err) => {
+        if (!!err) {
+            console.log(err.message)
+            res.json({
+                code: '2000',
+                type: 'single',
+                originalname: '',
+                msg: err.message,
+            })
+            return
+        }
+        if (!!req.file) {
+            res.json({
+                code: '0000',
+                type: 'single',
+                originalname: req.file.originalname,
+                msg: '',
+            })
+        } else {
+            res.json({
+                code: '1000',
+                type: 'single',
+                originalname: '',
+                msg: '',
+            })
+        }
+    })
+})
 
 router.get('/channels.json', function (req, res) {
     var baseUrl = 'http://ivi.bupt.edu.cn'

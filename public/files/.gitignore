@@ -1,5 +1,0 @@
-# 忽略文件夹内所有的文件
-*
-
-# 除了 .gitignore
-!.gitignore

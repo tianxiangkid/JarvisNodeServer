@@ -2,7 +2,6 @@ const fs = require('fs')
 const path = require('path')
 var express = require('express')
 var router = express.Router()
-var mime = require('./mime')
 var url = require('url')
 
 router.get('/', function (req, res, next) {
@@ -31,7 +30,7 @@ function listFiles(filePath, req, res, next) {
     })
 }
 
-// function showFile(filePath, req, res, next) {
+// function showFile(filePath, req, build, next) {
 //     //url模块的parse方法 接受一个字符串，返回一个url对象,切出来路径
 //     var file = filePath + req.url
 //
