@@ -3,6 +3,7 @@ var express = require('express')
 var path = require('path')
 var cookieParser = require('cookie-parser')
 var logger = require('morgan')
+const proxy = require('http-proxy-middleware')
 
 var indexRouter = require('./routes/index')
 var usersRouter = require('./routes/users')
@@ -30,6 +31,7 @@ app.use('/channels.json', function (req, res) {
     res.redirect('/api/channels.json')
 })
 
+// app.use('/upload', proxy({target: "http://localhost:3000", changeOrigin: true}))
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -52,7 +54,7 @@ var server = app.listen(8081, '0.0.0.0', function () {
     var host = server.address().address
     var port = server.address().port
 
-    console.log("应用实例，访问地址为 http://%s:%s", '127.0.0.1', port)
+    console.log("应用实例，访问地址为 http://%s:%s", 'localhost', port)
 
 })
 
