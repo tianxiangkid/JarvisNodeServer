@@ -10,6 +10,7 @@ var queryString = require('querystring')
 var mysql = require('mysql')
 
 const expressJwt = require('express-jwt')
+var jwt = require('jsonwebtoken');
 router.use("./", expressJwt({
     secret: 'secret12345',  // 签名的密钥 或 PublicKey
 }).unless({
@@ -107,7 +108,7 @@ function reqUserInfo(wxRes) {
             role = message.role
         }
         connection.end()
-        const token = 'Bearer ' + expressJwt(
+        const token = 'Bearer ' + jwt.sign(
             {
                 _id: wxRes.openid,
                 role: role,
