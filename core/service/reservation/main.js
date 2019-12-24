@@ -8,13 +8,6 @@ router.use('./', bodyParser.json())
 router.use('./', bodyParser.urlencoded({extended: false}))
 var queryString = require('querystring')
 var mysql = require('mysql')
-var connection = mysql.createConnection({
-    host: process.env.MYSQL_IP,
-    port: process.env.MYSQL_PORT,
-    user: process.env.MYSQL_USERNAME,
-    password: process.env.MYSQL_PASSWORD,
-    database: 'weixin_app',
-})
 
 const expressJwt = require('express-jwt')
 router.use("./", expressJwt({
@@ -22,13 +15,19 @@ router.use("./", expressJwt({
 }).unless({
     path: ['/onLogin'],  // 指定路径不经过 Token 解析
 }))
-properties.parse("properties.properties", {path: true}, function (error, obj) {
+
+var env
+properties.parse("properties.properties", {
+    sections: true,
+    path: true,
+}, function (error, obj) {
     if (error) {
         return console.error(error)
     }
-    console.log(obj)
-    //{ a: 1, b: 2 }
+    env = obj
+    console.log(env)
 })
+
 router.post('/onLogin', (app_req, app_res) => {
     console.log(app_req.body)
     var url = stringUtil.format("https://api.weixin.qq.com/sns/jscode2session" +
@@ -36,7 +35,7 @@ router.post('/onLogin', (app_req, app_res) => {
         "&secret=%s" +
         "&js_code=%s" +
         "&grant_type=authorization_code",
-        process.env.WX_APP_ID, process.env.WX_APP_SECRET, app_req.body.code)
+        env.weixin.appId, env.weixin.appSecret, app_req.body.code)
 
     try {
         request(url, {json: true}, (wx_err, wx_res, wx_body) => {
@@ -44,17 +43,19 @@ router.post('/onLogin', (app_req, app_res) => {
                 return console.log(wx_err)
             }
             try {
-                if (wx_body.errcode === 0) {
-                    app_res.json({
-                        status: 0,
-                        userInfo: reqUserInfo(wx_res),
-                    })
-                } else {
-                    app_res.json({
-                        status: 1401,
-                        "error": wx_res.body,
-                    })
-                }
+                wx_res.openid = "123"
+                reqUserInfo(wx_res)
+                // if (wx_body.errcode === 0) {
+                //     app_res.json({
+                //         status: 0,
+                //         userInfo: reqUserInfo(wx_res),
+                //     })
+                // } else {
+                //     app_res.json({
+                //         status: 1401,
+                //         "error": wx_res.body,
+                //     })
+                // }
             } catch (e) {
                 app_res.json({
                     status: 1500,
@@ -76,20 +77,40 @@ router.post('/onLogin', (app_req, app_res) => {
 // errcode	number	错误码
 // errmsg	string	错误信息
 function reqUserInfo(wxRes) {
+    var connection = mysql.createConnection({
+        host: env.db.hostname,
+        port: env.db.port,
+        user: env.db.username,
+        password: env.db.password,
+        database: 'weixin_app',
+    })
     connection.connect()
     var sql = 'SELECT * FROM user WHERE openid = "' + wxRes.openid + '"'
     connection.query(sql, function (err, result) {
         if (err) {
             console.log('查询失败 err: ' + err)
+            return
         }
-        //转换json
-        var message = JSON.stringify(result)
-        message = JSON.parse(message)
+        var role = "guest"
+        if (!result) {
+            connection.query("INSERT INTO user(openid,unionid) VALUES('" + wxRes.openid + "', '" + wxRes.unionid + "')", function (err, result) {
+                if (err) {
+                    console.log('插入失败 ' + wxRes.openid + ' err: ' + err)
+                } else {
+                    console.log(JSON.stringify(result))
+                }
+            })
+        } else {
+            //转换json
+            var message = JSON.stringify(result)
+            message = JSON.parse(message)
+            role = message.role
+        }
         connection.end()
         const token = 'Bearer ' + expressJwt.sign(
             {
                 _id: wxRes.openid,
-                role: message.role,
+                role: role,
             },
             'secret12345',
             {
@@ -99,12 +120,13 @@ function reqUserInfo(wxRes) {
         return {
             status: 'ok',
             data: {
-                role: message.role,
+                role: role,
                 token: token,
             },
         }
     })
 
 }
+
 
 module.exports = router
