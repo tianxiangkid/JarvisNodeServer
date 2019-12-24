@@ -100,14 +100,15 @@ function reqUserInfo(wxRes) {
                 } else {
                     console.log(JSON.stringify(result))
                 }
+                connection.end()
             })
         } else {
             //转换json
             var message = JSON.stringify(result)
             message = JSON.parse(message)
             role = message.role
+            connection.end()
         }
-        connection.end()
         const token = 'Bearer ' + jwt.sign({
                 _id: wxRes.openid,
                 role: role,
