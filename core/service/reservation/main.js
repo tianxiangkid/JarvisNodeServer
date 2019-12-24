@@ -107,7 +107,7 @@ function reqUserInfo(wxRes) {
             role = message.role
         }
         connection.end()
-        const token = 'Bearer ' + expressJwt.sign(
+        const token = 'Bearer ' + expressJwt(
             {
                 _id: wxRes.openid,
                 role: role,
