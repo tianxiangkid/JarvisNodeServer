@@ -93,7 +93,7 @@ function reqUserInfo(wxRes) {
             return
         }
         var role = "guest"
-        if (!result || result.empty()) {
+        if (!result || result.length === 0) {
             connection.query("INSERT INTO user(openid,unionid) VALUES('" + wxRes.openid + "', '" + wxRes.unionid + "')", function (err, result) {
                 if (err) {
                     console.log('插入失败 ' + wxRes.openid + ' err: ' + err)
