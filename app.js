@@ -9,6 +9,7 @@ var indexRouter = require('./routes/index')
 var usersRouter = require('./routes/users')
 var files = require('./core/files')
 var api = require('./core/api')
+var service = require('./core/service/main')
 
 var app = express()
 
@@ -27,6 +28,7 @@ app.use('/users', usersRouter)
 app.use('/files', files)
 
 app.use('/api', api)
+app.use('/service', service)
 app.use('/channels.json', function (req, res) {
     res.redirect('/api/channels.json')
 })
