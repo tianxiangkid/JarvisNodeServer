@@ -88,7 +88,6 @@ async function reqUserInfo(wxRes) {
             database: 'weixin_app',
         })
         connection.connect()
-        var role = "guest"
         var sql = 'SELECT * FROM user WHERE openid = "' + wxRes.openid + '"'
         connection.query(sql, function (err, result) {
             if (err) {
@@ -96,6 +95,7 @@ async function reqUserInfo(wxRes) {
                 reject('查询失败 err: ' + err)
                 return
             }
+            var role = "guest"
             if (!result || result.length === 0) {
                 connection.query("INSERT INTO user(openid,unionid) VALUES('" + wxRes.openid + "', '" + wxRes.unionid + "')", function (err, result) {
                     if (err) {
