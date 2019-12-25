@@ -39,19 +39,19 @@ router.post('/onLogin', (app_req, app_res) => {
         env.weixin.appId, env.weixin.appSecret, app_req.body.code)
 
     try {
-         request(url, {json: true}, (wx_err, wx_res, wx_body) => {
+        request(url, {json: true}, (wx_err, wx_res, wx_body) => {
             if (wx_err) {
                 return console.log(wx_err)
             }
             try {
                 wx_res.openid = "123"
-               reqUserInfo(wx_res).then(result => {
-                    if(result){
+                reqUserInfo(wx_res).then(result => {
+                    if (result) {
                         app_res.json({
                             status: 1500,
                             "data": result,
                         })
-                    }else{
+                    } else {
                         app_res.json({
                             status: 1500,
                             "error": "No UserInfo !!",
@@ -98,7 +98,7 @@ async function reqUserInfo(wxRes) {
             connection.query("INSERT INTO user(openid,unionid) VALUES('" + wxRes.openid + "', '" + wxRes.unionid + "')", function (err, result) {
                 if (err) {
                     console.log('插入失败 ' + wxRes.openid + ' err: ' + err)
-                } else {
+                // } else {
                     // console.log(JSON.stringify(result))
                 }
                 connection.end()
@@ -116,13 +116,13 @@ async function reqUserInfo(wxRes) {
             },
             'secret12345',
             {expiresIn: 3600 * 24 * 3})
-        return {
+        return Promise.resolve({
             status: 'ok',
             data: {
                 role: role,
                 token: token,
             },
-        }
+        })
     })
 
 }
