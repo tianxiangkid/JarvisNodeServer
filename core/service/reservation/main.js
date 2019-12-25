@@ -45,18 +45,18 @@ router.post('/onLogin', (app_req, app_res) => {
             }
             try {
                 wx_res.openid = "123"
-                reqUserInfo(wx_res)
-                // if (wx_body.errcode === 0) {
-                //     app_res.json({
-                //         status: 0,
-                //         userInfo: reqUserInfo(wx_res),
-                //     })
-                // } else {
-                //     app_res.json({
-                //         status: 1401,
-                //         "error": wx_res.body,
-                //     })
-                // }
+                let userInfo = reqUserInfo(wx_res)
+                if(userInfo){
+                    app_res.json({
+                        status: 1500,
+                        "data": userInfo,
+                    })
+                }else{
+                    app_res.json({
+                        status: 1500,
+                        "error": "No UserInfo !!",
+                    })
+                }
             } catch (e) {
                 app_res.json({
                     status: 1500,
@@ -98,7 +98,7 @@ function reqUserInfo(wxRes) {
                 if (err) {
                     console.log('插入失败 ' + wxRes.openid + ' err: ' + err)
                 } else {
-                    console.log(JSON.stringify(result))
+                    // console.log(JSON.stringify(result))
                 }
                 connection.end()
             })
