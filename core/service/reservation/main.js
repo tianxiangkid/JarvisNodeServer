@@ -88,7 +88,7 @@ async function reqUserInfo(wxRes) {
     })
     connection.connect()
     var sql = 'SELECT * FROM user WHERE openid = "' + wxRes.openid + '"'
-    await connection.query(sql, function (err, result) {
+    connection.query(sql, await function (err, result) {
         if (err) {
             console.log('查询失败 err: ' + err)
             return
@@ -98,7 +98,7 @@ async function reqUserInfo(wxRes) {
             connection.query("INSERT INTO user(openid,unionid) VALUES('" + wxRes.openid + "', '" + wxRes.unionid + "')", function (err, result) {
                 if (err) {
                     console.log('插入失败 ' + wxRes.openid + ' err: ' + err)
-                // } else {
+                    // } else {
                     // console.log(JSON.stringify(result))
                 }
                 connection.end()
