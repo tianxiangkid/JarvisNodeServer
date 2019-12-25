@@ -7,7 +7,7 @@ var url = require('url')
 router.get('/', function (req, res, next) {
     var filePath = path.join(__dirname + '/../public/files')
     // if (req.url.length === 1) {
-        listFiles(filePath, req, res, next)
+    listFiles(filePath, req, res, next)
     // } else {
     //     showFile(filePath, req, res, next)
     // }

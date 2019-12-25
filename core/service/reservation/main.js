@@ -79,52 +79,54 @@ router.post('/onLogin', (app_req, app_res) => {
 // errcode	number	错误码
 // errmsg	string	错误信息
 async function reqUserInfo(wxRes) {
-    var connection = mysql.createConnection({
-        host: env.db.hostname,
-        port: env.db.port,
-        user: env.db.username,
-        password: env.db.password,
-        database: 'weixin_app',
-    })
-    connection.connect()
-    var role = "guest"
-    var sql = 'SELECT * FROM user WHERE openid = "' + wxRes.openid + '"'
-    await connection.query(sql, await function (err, result) {
-        if (err) {
-            console.log('查询失败 err: ' + err)
-            return
-        }
-        if (!result || result.length === 0) {
-            connection.query("INSERT INTO user(openid,unionid) VALUES('" + wxRes.openid + "', '" + wxRes.unionid + "')", function (err, result) {
-                if (err) {
-                    console.log('插入失败 ' + wxRes.openid + ' err: ' + err)
-                    // } else {
-                    // console.log(JSON.stringify(result))
-                }
+    return await new Promise((resolve, reject) => {
+        var connection = mysql.createConnection({
+            host: env.db.hostname,
+            port: env.db.port,
+            user: env.db.username,
+            password: env.db.password,
+            database: 'weixin_app',
+        })
+        connection.connect()
+        var role = "guest"
+        var sql = 'SELECT * FROM user WHERE openid = "' + wxRes.openid + '"'
+        connection.query(sql, function (err, result) {
+            if (err) {
+                console.log('查询失败 err: ' + err)
+                reject('查询失败 err: ' + err)
+                return
+            }
+            if (!result || result.length === 0) {
+                connection.query("INSERT INTO user(openid,unionid) VALUES('" + wxRes.openid + "', '" + wxRes.unionid + "')", function (err, result) {
+                    if (err) {
+                        console.log('插入失败 ' + wxRes.openid + ' err: ' + err)
+                        // } else {
+                        // console.log(JSON.stringify(result))
+                    }
+                    connection.end()
+                })
+            } else {
+                //转换json
+                var message = JSON.stringify(result)
+                message = JSON.parse(message)
+                role = message.role
                 connection.end()
+            }
+            const token = 'Bearer ' + jwt.sign({
+                    _id: wxRes.openid,
+                    role: role,
+                },
+                'secret12345',
+                {expiresIn: 3600 * 24 * 3})
+            resolve({
+                status: 'ok',
+                data: {
+                    role: role,
+                    token: token,
+                },
             })
-        } else {
-            //转换json
-            var message = JSON.stringify(result)
-            message = JSON.parse(message)
-            role = message.role
-            connection.end()
-        }
+        })
     })
-    const token =  'Bearer ' +  jwt.sign({
-            _id: wxRes.openid,
-            role: role,
-        },
-        'secret12345',
-        {expiresIn: 3600 * 24 * 3})
-    return Promise.resolve({
-        status: 'ok',
-        data: {
-            role: role,
-            token: token,
-        },
-    })
-
 }
 
 
