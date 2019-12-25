@@ -77,7 +77,7 @@ router.post('/onLogin', (app_req, app_res) => {
 // unionid	string	用户在开放平台的唯一标识符，在满足 UnionID 下发条件的情况下会返回，详见 UnionID 机制说明。
 // errcode	number	错误码
 // errmsg	string	错误信息
-function reqUserInfo(wxRes) {
+async function reqUserInfo(wxRes) {
     var connection = mysql.createConnection({
         host: env.db.hostname,
         port: env.db.port,
@@ -87,7 +87,7 @@ function reqUserInfo(wxRes) {
     })
     connection.connect()
     var sql = 'SELECT * FROM user WHERE openid = "' + wxRes.openid + '"'
-    connection.query(sql, function (err, result) {
+    await connection.query(sql, function (err, result) {
         if (err) {
             console.log('查询失败 err: ' + err)
             return
