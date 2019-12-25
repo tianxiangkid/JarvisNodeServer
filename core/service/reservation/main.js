@@ -87,13 +87,13 @@ async function reqUserInfo(wxRes) {
         database: 'weixin_app',
     })
     connection.connect()
+    var role = "guest"
     var sql = 'SELECT * FROM user WHERE openid = "' + wxRes.openid + '"'
-    connection.query(sql, await function (err, result) {
+    await connection.query(sql, await function (err, result) {
         if (err) {
             console.log('查询失败 err: ' + err)
             return
         }
-        var role = "guest"
         if (!result || result.length === 0) {
             connection.query("INSERT INTO user(openid,unionid) VALUES('" + wxRes.openid + "', '" + wxRes.unionid + "')", function (err, result) {
                 if (err) {
@@ -110,19 +110,19 @@ async function reqUserInfo(wxRes) {
             role = message.role
             connection.end()
         }
-        const token = 'Bearer ' + jwt.sign({
-                _id: wxRes.openid,
-                role: role,
-            },
-            'secret12345',
-            {expiresIn: 3600 * 24 * 3})
-        return Promise.resolve({
-            status: 'ok',
-            data: {
-                role: role,
-                token: token,
-            },
-        })
+    })
+    const token =  'Bearer ' +  jwt.sign({
+            _id: wxRes.openid,
+            role: role,
+        },
+        'secret12345',
+        {expiresIn: 3600 * 24 * 3})
+    return Promise.resolve({
+        status: 'ok',
+        data: {
+            role: role,
+            token: token,
+        },
     })
 
 }
