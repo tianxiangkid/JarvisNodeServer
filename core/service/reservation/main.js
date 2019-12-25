@@ -39,24 +39,25 @@ router.post('/onLogin', (app_req, app_res) => {
         env.weixin.appId, env.weixin.appSecret, app_req.body.code)
 
     try {
-        request(url, {json: true}, (wx_err, wx_res, wx_body) => {
+         request(url, {json: true}, (wx_err, wx_res, wx_body) => {
             if (wx_err) {
                 return console.log(wx_err)
             }
             try {
                 wx_res.openid = "123"
-                let userInfo = reqUserInfo(wx_res)
-                if(userInfo){
-                    app_res.json({
-                        status: 1500,
-                        "data": userInfo,
-                    })
-                }else{
-                    app_res.json({
-                        status: 1500,
-                        "error": "No UserInfo !!",
-                    })
-                }
+               reqUserInfo(wx_res).then(result => {
+                    if(result){
+                        app_res.json({
+                            status: 1500,
+                            "data": result,
+                        })
+                    }else{
+                        app_res.json({
+                            status: 1500,
+                            "error": "No UserInfo !!",
+                        })
+                    }
+                })
             } catch (e) {
                 app_res.json({
                     status: 1500,
