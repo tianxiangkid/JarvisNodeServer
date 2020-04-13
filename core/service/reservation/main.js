@@ -17,17 +17,18 @@ router.use("./", expressJwt({
     path: ['/onLogin'],  // 指定路径不经过 Token 解析
 }))
 
-var env
-properties.parse("properties.properties", {
-    sections: true,
-    path: true,
-}, function (error, obj) {
-    if (error) {
-        return console.error(error)
-    }
-    env = obj
-    console.log(env)
-})
+var env = function () {
+    properties.parse("properties.properties", {
+        sections: true,
+        path: true,
+    }, function (error, obj) {
+        if (error) {
+            return console.error(error)
+        }
+        env = obj
+        console.log(env)
+    })
+}
 
 router.post('/onLogin', (app_req, app_res) => {
     console.log(app_req.body)
@@ -71,6 +72,10 @@ router.post('/onLogin', (app_req, app_res) => {
             "error": e,
         })
     }
+})
+
+router.post('/getEvents', (app_req, app_res) => {
+
 })
 
 // openid	string	用户唯一标识
