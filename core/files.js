@@ -20,7 +20,12 @@ function listFiles(filePath, req, res, next) {
             throw err
         }
         var files = []
-        results.forEach(function (file) {
+        results
+            .filter(file => file.toUpperCase() === "video.html".toUpperCase())
+            .filter(file => file.toUpperCase() === "video.mp4".toUpperCase())
+            .filter(file => file.toUpperCase() === "music.html".toUpperCase())
+            .filter(file => file.toUpperCase() === "music.wav".toUpperCase())
+            .forEach(function (file) {
             if (file.toUpperCase() === "test.file".toUpperCase() && results.length > 1) {
                 return
             }
