@@ -20,11 +20,13 @@ function listFiles(filePath, req, res, next) {
             throw err
         }
         var files = []
-        results.forEach(function (file) {
-            if (fs.statSync(path.join(filePath, file)).isFile()) {
-                files.push(file)
-            }
-        })
+        results
+            .filter(file => file === "test.file" && results.length > 1)
+            .forEach(function (file) {
+                if (fs.statSync(path.join(filePath, file)).isFile()) {
+                    files.push(file)
+                }
+            })
         var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl
         res.render('files', {files: files, baseUrl: fullUrl})
     })
