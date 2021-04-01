@@ -13,9 +13,6 @@ var upload = require('multer')({
 var app = express()
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
-app.listen('8888', function () {
-    console.log('.....')
-})
 app.post('/uploads', upload.any(), function (req, res) {
     console.log(req.fields)
     console.log(req.files) // 此时可以在req.files 已上传内容的信息了
