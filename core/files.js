@@ -30,7 +30,7 @@ function listFiles(filePath, req, res, next) {
                 files.push(file)
             }
         })
-        var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl
+        var fullUrl = 'https://' + req.get('host') + req.originalUrl
         res.render('files', {files: files, baseUrl: fullUrl})
     })
 }
