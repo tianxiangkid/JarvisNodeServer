@@ -7,7 +7,7 @@ router.get('/', function (req, res, next) {
 })
 var bodyParser = require('body-parser')
 var upload = require('multer')({
-    dest: 'uploads/', //指定文件上传后存放的位置
+    dest: './public/files/', //指定文件上传后存放的位置
 })
 
 var app = express()
