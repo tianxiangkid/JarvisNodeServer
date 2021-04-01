@@ -21,9 +21,11 @@ function listFiles(filePath, req, res, next) {
         }
         var files = []
         results.forEach(function (file) {
-            if (file => file === "test.file" && results.length > 1) {
+            if (file.toUpperCase() === "test.file".toUpperCase() && results.length > 1) {
                 return
             }
+            console.log("file: " + file)
+            console.log("results.length: " + results.length)
             if (fs.statSync(path.join(filePath, file)).isFile()) {
                 files.push(file)
             }
